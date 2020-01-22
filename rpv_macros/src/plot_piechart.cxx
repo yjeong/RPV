@@ -77,7 +77,7 @@ int main()
 			set_piechart(pie4[ibin][inb]);
 			if(!(ibin==31 && inb==2)){
 				pie4[ibin][inb]->Draw("nol <");
-				cpie[ibin][inb]->SaveAs(outputdir+Form("MC_piechart_bin%i_MJ"+GeV[inb]+".png",ibin));
+				cpie[ibin][inb]->SaveAs(outputdir+Form("MC_piechart_bin%i_MJ"+GeV[inb]+".pdf",ibin));
 			}
 		}
 	}
