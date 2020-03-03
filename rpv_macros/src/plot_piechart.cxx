@@ -39,7 +39,7 @@ int main()
 	outputdir = "/cms/scratch/yjeong/CMSSW_10_2_13/src/RPV/rpv_macros/plots/";
 	inputdir = "/cms/scratch/yjeong/CMSSW_10_2_13/src/RPV/rpv_macros/variations/";
 
-	TFile* infile  = TFile::Open(inputdir+"output_nominal_newnt.root", "READ");
+	TFile* infile  = TFile::Open(inputdir+"output_nominal_newnt_nl0shape.root", "READ");
 
 	float qcd[34][3], ttbar[34][3], wjets[34][3], other[34][3], sig1600[34][3];
 
