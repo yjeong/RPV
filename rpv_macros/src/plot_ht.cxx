@@ -38,26 +38,27 @@ int main(){
 	const int nfiles = 4;
 	TString inputdir, outputdir;
 	outputdir = "/cms/scratch/yjeong/CMSSW_10_2_13/src/RPV/rpv_macros/plots_ht/";
-	inputdir = "/xrootd_user/yjeong/xrootd/nanoprocessing/2016/merged_rpvfitnbge0/";
+	//inputdir = "/xrootd_user/yjeong/xrootd/nanoprocessing/2016/merged_rpvfitnbge0/";
+	inputdir = "/xrootd_user/yjeong/xrootd/nanoprocessing/2016/processed/";
 
 	TString filename[nfiles] = {
-		"600to800_TuneCUETP8M1_18",
-		"800to1200_TuneCUETP8M1_14",
-		"1200to2500_TuneCUETP8M1_7",
-		"2500toInf_TuneCUETP8M1_4"
+		"A73A4F60-87D6-0B44-A377-1B29B24DF617_fatjetbaby_TTJets_HT-2500toInf_TuneCUETP8M1.root",
+		"CEFBBD30-07B3-EB43-8325-D4E887570D33_fatjetbaby_TTJets_HT-1200to2500_TuneCUETP8M1.root",
+		"CCF461B3-DC23-2549-968C-6F28A8A72D77_fatjetbaby_TTJets_HT-800to1200_TuneCUETP8M1.root",
+		"8C973745-0EDF-484F-A51D-950BA631194E_fatjetbaby_TTJets_HT-600to800_TuneCUETP8M1.root"
 	};
 	//---------------TTJets_HT_All-------------------
 	TString alltt;
-	alltt = "TTJets_TuneCUETP8M1_11";
+	alltt = "8F42BDAD-0FF8-6849-9BF0-D55E5D02CD6D_fatjetbaby_TTJets_TuneCUETP8M1.root";
 	TFile *f1;
 	TTree *t1;
 	TH1F *h2;
 	TCanvas *c1;
 	c1 = new TCanvas;
 	c1->SetLogy();
-	f1 = new TFile(inputdir+alltt+".root");
+	f1 = new TFile(inputdir+alltt);
 	t1 = (TTree*)f1->Get("tree");
-	h2 = new TH1F("h2","TTJets_HT",100,1100,7000);
+	h2 = new TH1F("h2","TTJets_HT",25,0,5000);
 	for(int i = 0; i<t1->GetEntries(); i++){
 		t1->GetEntry(i);
 		t1->SetBranchAddress("ht",&ht);
@@ -86,14 +87,14 @@ int main(){
 	float ymax = 0;
 	hs = new THStack("hs","TTJets_HT");
 	for(int i = 0; i < nfiles; i++){
-		tfile[i] = new TFile(inputdir+"TTJets_HT-"+filename[i]+".root");
+		tfile[i] = new TFile(inputdir+filename[i]);
 		tree[i] = (TTree*)tfile[i]->Get("tree");
 		tree[i]->SetBranchAddress("ht",&ht);
 		tree[i]->SetBranchAddress("w_isr_tr",&w_isr_tr);
 		tree[i]->SetBranchAddress("w_lumi",&w_lumi);
 		tree[i]->SetBranchAddress("weight",&weight);
 
-		h1[i] = new TH1F(Form("h1_%d",i),Form("TTJets_HT"),100,1100,7000);
+		h1[i] = new TH1F(Form("h1_%d",i),Form("TTJets_HT"),25,0,5000);
 		set_histo_style(h1[i]);
 		for(int j=0; j<tree[i]->GetEntries();j++){
 			tree[i]->GetEntry(j);
@@ -118,10 +119,10 @@ int main(){
 			l->AddEntry(h1[i],"2500toInf");
 		}
 		hs->Add(h1[i]);
+		if(i==3)ymax = h1[i]->GetMaximum();
 		c2->cd();
 		if(i==0){
-			ymax = h1[i]->GetMaximum();
-			h1[i]->SetMaximum(ymax*1.5);
+			h1[i]->SetMaximum(ymax*100000);
 			h1[i]->Draw("hist");
 		}
 		else if(i>0)h1[i]->Draw("histsame");
@@ -130,7 +131,7 @@ int main(){
 	l->Draw();
 	c2->SaveAs(outputdir+"TTJets_Ht.png");
 	c3->cd();
-	hs->SetMaximum(ymax*1.5);
+	hs->SetMaximum(ymax*100000);
 	hs->Draw("hist");
 	h2->Draw("histsame");
 	l->Draw();
