@@ -106,11 +106,11 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
   TString plot_tag("_lumi"+lumi_nodot+filetype);
   float minLog = 0.04, fracLeg = 0.36; // Fraction of the histo pad devoted to the legend
 
-  double legLeft(style.PadLeftMargin+0.03), legRight(1-style.PadRightMargin-0.02);
-  double legY(1-style.PadTopMargin-0.027), legSingle = 0.052;
-  if (doRatio) {legY=1-style.PadTopMargin-0.041; legSingle = 0.06;}
-  double legW = 0.13, legH = legSingle*(vars[0].samples.size()+1)/2;
-  double legX1[] = {legLeft, legLeft+(legRight-legLeft)/2.*1.15};
+  double legLeft(style.PadLeftMargin+0.03), legRight(1-style.PadRightMargin-0.03);
+  double legY(1-style.PadTopMargin-0.020)/*-0.027*/, legSingle = 0.03;//= 0.052
+  if (doRatio) {legY=1-style.PadTopMargin-0.020; legSingle = 0.03;}
+  double legW = 0.10, legH = legSingle*(vars[0].samples.size()+1)/2;
+  double legX1[] = {legLeft, (legLeft+legRight)/2};
   TLegend leg[2]; int nLegs(2);
   for(int ileg(0); ileg<nLegs; ileg++){
     leg[ileg].SetX1NDC(legX1[ileg]); leg[ileg].SetX2NDC(legX1[ileg]+legW); 
@@ -130,8 +130,11 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
     const unsigned Nsam(vars[var].samples.size());
     legH = (Nsam<=3?legSingle*Nsam:legSingle*(Nsam+1)/2);
     // Calculating fraction of internal pad taken by the legend, and adding a 4% buffer
-    fracLeg = (legH+1-style.PadTopMargin-legY)/(1-style.PadTopMargin-style.PadBottomMargin) + 0.04;
-    for(int ileg(0); ileg<nLegs; ileg++) leg[ileg].SetY1NDC(legY-legH); 
+    fracLeg = (legH+1-style.PadTopMargin-legY)/(1-style.PadTopMargin-style.PadBottomMargin) + 0.01;
+    for(int ileg(0); ileg<nLegs; ileg++){
+	leg[ileg].SetY1NDC(legY-legH);
+	leg[ileg].SetY2NDC(legY); 
+	}
     leg[1].SetX1NDC(legX1[1]+vars[var].moveRLegend); leg[1].SetX2NDC(legX1[1]+legW+vars[var].moveRLegend); 
 
     cout<<endl;
@@ -173,8 +176,8 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       else chain[isam]->Project(histo[0][var][sam]->GetName(), samVariable, totCut);
       if(vars[var].addOverflow) 
 	histo[0][var][sam]->SetBinContent(vars[var].nbins,
-					  histo[0][var][sam]->GetBinContent(vars[var].nbins)+
-					  histo[0][var][sam]->GetBinContent(vars[var].nbins+1));
+	histo[0][var][sam]->GetBinContent(vars[var].nbins)+
+	histo[0][var][sam]->GetBinContent(vars[var].nbins+1));
       
      
       nentries[sam] = histo[0][var][sam]->Integral(1,vars[var].nbins);
@@ -483,7 +486,7 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
       pad->SetLogy(1);
       pname = outfolder+"/log_lumi_"+vars[var].tag+plot_tag;
       if(vars[var].normalize) pname.ReplaceAll("/log_lumi","/log_norm");
-      if(!vars[var].skiplog && (vars[var].whichPlots.Contains("0") || vars[var].whichPlots.Contains("1"))) 
+      if(!vars[var].skiplog && (vars[var].whichPlots.Contains("0") || vars[var].whichPlots.Contains("1")))
         can.SaveAs(pname);
       pad->SetLogy(0);
  
@@ -540,7 +543,8 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
           leghisto += RoundNumber(histo[1][var][sam]->GetMean(),digits) + "]";
         } else{
           leg[ileg].SetX1NDC(0.24); leg[ileg].SetX2NDC(0.7);
-          leg[ileg].SetTextSize(0.75*style.LegendSize);
+          //leg[ileg].SetTextSize(0.75*style.LegendSize);
+          leg[ileg].SetTextSize(0.5*style.LegendSize);
 	  if(vars[var].varname.Contains("tks")) leghisto +=  "[N_{tks} = " + RoundNumber(nentries[sam],1) + ", from N_{events} = "
             +RoundNumber(vars[var].nevents.at(sam),1)+"]";
         }
@@ -557,7 +561,10 @@ void plot_distributions(vector<sfeats> Samples, vector<hfeats> vars, TString lum
     float minhisto(0), maxpad(minhisto + (maxhisto-minhisto)/(1-fracLeg));
     histo[1][var][0]->SetMinimum(minhisto);
     histo[1][var][0]->SetMaximum(maxpad);
-    histo[1][var][0]->Draw("axis same");
+    histo[1][var][0]->Draw("e same");//FIXME
+    histo[1][var][1]->Draw("same");//FIXME
+    histo[1][var][2]->Draw("same");//FIXME
+    histo[1][var][3]->Draw("same");//FIXME*/
     style.moveYAxisLabel(histo[1][var][0], maxpad, false);
     can.SetLogy(0);
     if(vars[var].cuts.Contains("abs(isr_tru_pt)")){
